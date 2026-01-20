@@ -15,7 +15,7 @@ import { googleLogin, usernamePasswordLogin } from './api/auth.api';
 
 // Google OAuth 2.0 Client ID (Web Client ID from Google Cloud Console)
 // This is required for both Android and iOS to get the ID token
-const GOOGLE_WEB_CLIENT_ID = '53823350765-fuea17n0a5c1h4c42eg8kkgmckeqci09.apps.googleusercontent.com';
+const GOOGLE_WEB_CLIENT_ID = '';
 
 
 GoogleSignin.configure({
