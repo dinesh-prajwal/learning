@@ -13,16 +13,15 @@ import {
 import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
 import { googleLogin, usernamePasswordLogin } from './api/auth.api';
 
-// Google OAuth 2.0 Client ID (Web Client ID from Google Cloud Console)
-// This is required for both Android and iOS to get the ID token
-const GOOGLE_WEB_CLIENT_ID = '';
+
+const GOOGLE_WEB_CLIENT_ID = '53823350765-fuea17n0a5c1h4c42eg8kkgmckeqci09.apps.googleusercontent.com';
 
 
 GoogleSignin.configure({
-  webClientId: GOOGLE_WEB_CLIENT_ID, // Required for getting idToken on both platforms
-  offlineAccess: true, // If you want to access Google API on behalf of the user FROM YOUR SERVER
-  forceCodeForRefreshToken: true, // [Android] related to `serverAuthCode`, read the docs link below *.
-  iosClientId: '', // [iOS] optional, if you want to specify the client ID of type iOS (otherwise, it is taken from GoogleService-Info.plist)
+  webClientId: GOOGLE_WEB_CLIENT_ID, 
+  offlineAccess: true, 
+  forceCodeForRefreshToken: true, 
+  iosClientId: '53823350765-bas4vtbv5196e8cljd6no7tlvc7pvlot.apps.googleusercontent.com', 
 });
 
 export function Login() {
@@ -32,20 +31,20 @@ export function Login() {
   const [password, setPassword] = useState('');
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
 
-  // Check if user is already signed in on component mount
+  
   useEffect(() => {
     checkCurrentUser();
   }, []);
 
   const checkCurrentUser = async () => {
     try {
-      // Try to get current user (will throw if not signed in)
+      
       const currentUser = await GoogleSignin.getCurrentUser();
       if (currentUser) {
         console.log('Current user already signed in:', currentUser);
       }
     } catch (error) {
-      // User is not signed in, which is fine
+      
       console.log('No current user signed in');
     }
   };
@@ -95,39 +94,36 @@ export function Login() {
     try {
       setIsGoogleLoading(true);
       setError('');
-
-      // Check if Google Play Services are available (Android only)
       if (Platform.OS === 'android') {
+
         await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
       }
 
-      // Sign out and revoke access to force account picker to show
-      // This ensures users can select a different account each time
+      
       try {
-        // Revoke access first (clears the token and forces account selection)
+        
         await GoogleSignin.revokeAccess();
       } catch (revokeError) {
-        // Ignore revoke errors (user might not be signed in)
+        
         console.log('Revoke access failed (user may not be signed in):', revokeError);
       }
       
       try {
-        // Sign out to clear any cached session
         await GoogleSignin.signOut();
       } catch (signOutError) {
-        // Ignore sign out errors (user might not be signed in)
+   
         console.log('Sign out failed (user may not be signed in):', signOutError);
       }
 
-      // Sign in with Google (this will now show the account picker)
+      
       const result = await GoogleSignin.signIn();
       
-      // Check if sign-in was successful
+      
       if (result.type !== 'success') {
         throw new Error('Sign-in was cancelled or failed');
       }
 
-      // Access idToken and user info from the nested data object
+      
       const idToken = result.data.idToken;
       const userInfo = result.data.user;
       
@@ -140,12 +136,12 @@ export function Login() {
         user: userInfo,
       });
 
-      // Call backend API to verify token and create session
+      
       try {
         const authResponse = await googleLogin(idToken);
         
         if (authResponse.success) {
-          // Display success message with user info
+          
           const userName = userInfo?.name || userInfo?.email || 'User';
           Alert.alert(
             'Success', 
@@ -153,7 +149,7 @@ export function Login() {
             [{ text: 'OK' }]
           );
           
-          // Log user info for debugging
+         
           console.log('Backend Auth Response:', {
             user: authResponse.user,
             token: authResponse.token ? 'Token received' : 'No token',
